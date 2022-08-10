@@ -13,17 +13,21 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersController = void 0;
+const jwt_auth_guard_1 = require("./../auth/jwt-auth.guard");
 const users_service_1 = require("./users.service");
 const create_user_dto_1 = require("./dto/create-user-dto");
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const users_model_1 = require("./users.model");
 let UsersController = class UsersController {
-    constructor(UsersService) {
-        this.UsersService = UsersService;
+    constructor(usersService) {
+        this.usersService = usersService;
     }
     create(userDto) {
-        return this.UsersService.createUser(userDto);
+        return this.usersService.createUser(userDto);
+    }
+    getAll() {
+        return this.usersService.getAllUsers();
     }
 };
 __decorate([
@@ -35,6 +39,15 @@ __decorate([
     __metadata("design:paramtypes", [create_user_dto_1.CreateUserDto]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "create", null);
+__decorate([
+    (0, swagger_1.ApiOperation)({ summary: 'Получить всех пользователей' }),
+    (0, swagger_1.ApiResponse)({ status: 200, type: [users_model_1.User] }),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "getAll", null);
 UsersController = __decorate([
     (0, swagger_1.ApiTags)('Пользователи'),
     (0, common_1.Controller)('users'),

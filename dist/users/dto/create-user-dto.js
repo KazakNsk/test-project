@@ -14,7 +14,7 @@ const swagger_1 = require("@nestjs/swagger");
 class CreateUserDto {
 }
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: '1234qwerty', description: 'пароль пользователя' }),
+    (0, swagger_1.ApiProperty)({ example: '1234qwerty', description: 'почтовый адрес пользователя' }),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "email", void 0);
 __decorate([

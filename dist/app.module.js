@@ -12,6 +12,10 @@ const sequelize_1 = require("@nestjs/sequelize");
 const users_module_1 = require("./users/users.module");
 const config_1 = require("@nestjs/config");
 const users_model_1 = require("./users/users.model");
+const tags_module_1 = require("./tags/tags.module");
+const tags_model_1 = require("./tags/tags.model");
+const users_tags_model_1 = require("./users/users-tags.model");
+const auth_module_1 = require("./auth/auth.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -29,10 +33,12 @@ AppModule = __decorate([
                 username: process.env.POSTGRES_USER,
                 password: process.env.POSTGRES_PASSWORD,
                 database: process.env.POSTGRES_DB,
-                models: [users_model_1.User],
+                models: [users_model_1.User, tags_model_1.Tag, users_tags_model_1.UserTag],
                 autoLoadModels: true
             }),
-            users_module_1.UsersModule
+            users_module_1.UsersModule,
+            tags_module_1.TagsModule,
+            auth_module_1.AuthModule
         ]
     })
 ], AppModule);

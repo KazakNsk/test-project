@@ -12,6 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const sequelize_typescript_1 = require("sequelize-typescript");
+const tags_model_1 = require("../tags/tags.model");
+const users_tags_model_1 = require("./users-tags.model");
 let User = class User extends sequelize_typescript_1.Model {
 };
 __decorate([
@@ -25,15 +27,19 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: '1234qwerty', description: 'пароль пользователя' }),
+    (0, swagger_1.ApiProperty)({ example: '1234qwerty', description: 'Пароль пользователя' }),
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING(100), allowNull: false }),
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'User_user', description: 'Никнейм' }),
+    (0, swagger_1.ApiProperty)({ example: 'example', description: 'Никнейм' }),
     (0, sequelize_typescript_1.Column)({ type: sequelize_typescript_1.DataType.STRING(30), allowNull: false, unique: true }),
     __metadata("design:type", String)
 ], User.prototype, "nickname", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsToMany)(() => tags_model_1.Tag, () => users_tags_model_1.UserTag),
+    __metadata("design:type", Array)
+], User.prototype, "tags", void 0);
 User = __decorate([
     (0, sequelize_typescript_1.Table)({ tableName: 'users' })
 ], User);
