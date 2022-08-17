@@ -14,24 +14,86 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TagsService = void 0;
 const common_1 = require("@nestjs/common");
+const common_2 = require("@nestjs/common");
 const sequelize_1 = require("@nestjs/sequelize");
-const auth_service_1 = require("./../auth/auth.service");
+const jwt_1 = require("@nestjs/jwt");
 const tags_model_1 = require("./tags.model");
+;
 let TagsService = class TagsService {
-    constructor(tagRepository, authService) {
+    constructor(tagRepository, jwtService) {
         this.tagRepository = tagRepository;
-        this.authService = authService;
+        this.jwtService = jwtService;
     }
     async createTag(dto, req) {
-        const userId = this.authService.getUserIdFromRequest(req);
-        const tag = await this.tagRepository.create({ name: dto.name, creator: userId });
+        await this.validateTag(dto.name);
+        const id = this.getUserIdFromRequest(req);
+        const tag = await this.tagRepository.create({ name: dto.name, sortOrder: dto.sortOrder, creator: id });
         return tag;
+    }
+    async updateTag(dto, id, req) {
+        await this.validateTag(dto.name);
+        const userId = this.getUserIdFromRequest(req);
+        if (userId !== id) {
+            throw new common_1.UnauthorizedException({ message: 'Только создатель тэга может изменять тэг' });
+        }
+        const tag = await this.tagRepository.update(dto, { where: { id: id }, returning: true })
+            .then(function (result) {
+            return result[1];
+        });
+        return tag[0];
+    }
+    async getTagById(id) {
+        return await this.tagRepository.findAll({ where: { id: id } });
+    }
+    async getTagsByIds(tagIds) {
+        return await this.tagRepository.findAll({ where: { id: tagIds } });
+    }
+    async getTags(dto) {
+        const arrSortOptions = [];
+        const queryObject = {};
+        const meta = {};
+        if (dto.sortByName || dto.sortByOrder) {
+            if (dto.sortByName) {
+                arrSortOptions.push(['name', 'ASC']);
+            }
+            if (dto.sortByOrder) {
+                arrSortOptions.push(['sortOrder', 'ASC']);
+            }
+            Object.assign(queryObject, { order: arrSortOptions });
+        }
+        if (dto.page) {
+            meta['page'] = dto.page;
+            Object.assign(queryObject, { offset: dto.page });
+        }
+        if (dto.pageSize) {
+            meta['pageSize'] = dto.pageSize;
+            Object.assign(queryObject, { limit: dto.pageSize });
+        }
+        const { rows, count } = await this.tagRepository.findAndCountAll(queryObject);
+        meta['quantity'] = count;
+        return { rows, meta };
+    }
+    async validateTag(name) {
+        const tag = await this.tagRepository.findOne({
+            where: {
+                name: name,
+            }
+        });
+        if (tag) {
+            throw new common_2.BadRequestException({ message: 'Данное имя тэга уже есть в базе' });
+        }
+    }
+    getUserIdFromRequest(request) {
+        const token = request.headers.authorization.split(' ')[1];
+        const decodeObj = this.jwtService.decode(token);
+        const { id } = decodeObj;
+        return id;
     }
 };
 TagsService = __decorate([
-    (0, common_1.Injectable)(),
+    (0, common_2.Injectable)(),
     __param(0, (0, sequelize_1.InjectModel)(tags_model_1.Tag)),
-    __metadata("design:paramtypes", [Object, auth_service_1.AuthService])
+    __metadata("design:paramtypes", [Object, jwt_1.JwtService])
 ], TagsService);
 exports.TagsService = TagsService;
 //# sourceMappingURL=tags.service.js.map

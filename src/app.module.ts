@@ -14,7 +14,7 @@ import { AuthModule } from './auth/auth.module';
     providers: [],
     imports: [
         ConfigModule.forRoot({
-            envFilePath:`${process.env.NODE_ENV}.env`
+            envFilePath:`.${process.env.NODE_ENV}.env`
         }),
         SequelizeModule.forRoot({
             dialect: 'postgres',

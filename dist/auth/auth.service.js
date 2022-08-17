@@ -24,22 +24,8 @@ let AuthService = class AuthService {
         return this.generateToken(user);
     }
     async signUp(userDto) {
-        const candidate = await this.usersService.getUserByEmail(userDto.email);
-        if (candidate) {
-            throw new common_1.HttpException('Пользователь с такой почтой существует', common_1.HttpStatus.BAD_REQUEST);
-        }
-        const nicknameCandidate = await this.usersService.getUserByNickname(userDto.nickname);
-        if (nicknameCandidate) {
-            throw new common_1.HttpException('Пользователь с таким никнеймом уже существует', common_1.HttpStatus.BAD_REQUEST);
-        }
-        const validateEmailCondition = this.usersService.validateEmail(userDto.email);
-        if (!validateEmailCondition) {
-            throw new common_1.HttpException('Инвалидный емайл', common_1.HttpStatus.BAD_REQUEST);
-        }
-        const validatePasswordCondition = this.usersService.validatePassword(userDto.password);
-        if (!validatePasswordCondition) {
-            throw new common_1.HttpException('Пароль должен содержать как минимум одну цифру, одну заглавную и одну строчную буквы, минимум 4 символа', common_1.HttpStatus.BAD_REQUEST);
-        }
+        this.usersService.validateByEmail(userDto.email);
+        this.usersService.validateByNickname(userDto.nickname);
         const hashPassword = await bcrypt.hash(userDto.password, 5);
         const user = await this.usersService.createUser(Object.assign(Object.assign({}, userDto), { password: hashPassword }));
         return this.generateToken(user);
@@ -47,25 +33,19 @@ let AuthService = class AuthService {
     async validateUser(userDto) {
         const user = await this.usersService.getUserByEmail(userDto.email);
         if (user == null) {
-            throw new common_1.UnauthorizedException({ message: 'Некорректный емайл' });
+            throw new common_1.BadRequestException({ message: 'Такого емайла нет в базе емайл' });
         }
         const passwordEquals = await bcrypt.compare(userDto.password, user.password);
         if (user && passwordEquals) {
             return user;
         }
-        throw new common_1.UnauthorizedException({ message: 'Некорректный пароль' });
+        throw new common_1.BadRequestException({ message: 'Неверный пароль' });
     }
     async generateToken(user) {
         const payload = { email: user.email, id: user.id, nickname: user.nickname };
         return {
             token: this.jwtService.sign(payload)
         };
-    }
-    getUserIdFromRequest(request) {
-        const token = request.headers.authorization.split(' ')[1];
-        let decodeObj = this.jwtService.decode(token);
-        let { id } = decodeObj;
-        return id;
     }
 };
 AuthService = __decorate([

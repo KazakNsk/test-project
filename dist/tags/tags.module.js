@@ -7,9 +7,10 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TagsModule = void 0;
+const jwt_1 = require("@nestjs/jwt");
+const auth_module_1 = require("../auth/auth.module");
 const common_1 = require("@nestjs/common");
 const sequelize_1 = require("@nestjs/sequelize");
-const auth_module_1 = require("../auth/auth.module");
 const users_tags_model_1 = require("../users/users-tags.model");
 const users_model_1 = require("../users/users.model");
 const tags_controller_1 = require("./tags.controller");
@@ -23,8 +24,10 @@ TagsModule = __decorate([
         providers: [tags_service_1.TagsService],
         imports: [
             auth_module_1.AuthModule,
+            jwt_1.JwtModule,
             sequelize_1.SequelizeModule.forFeature([tags_model_1.Tag, users_model_1.User, users_tags_model_1.UserTag])
         ],
+        exports: [tags_service_1.TagsService]
     })
 ], TagsModule);
 exports.TagsModule = TagsModule;

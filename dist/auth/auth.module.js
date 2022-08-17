@@ -9,20 +9,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
-const passport_1 = require("@nestjs/passport");
 const users_module_1 = require("../users/users.module");
 const auth_controller_1 = require("./auth.controller");
 const auth_service_1 = require("./auth.service");
-const jwt_strategy_1 = require("./jwt.strategy");
 let AuthModule = class AuthModule {
 };
 AuthModule = __decorate([
     (0, common_1.Module)({
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy],
+        providers: [auth_service_1.AuthService],
         imports: [
             (0, common_1.forwardRef)(() => users_module_1.UsersModule),
-            passport_1.PassportModule.register({ defaultStrategy: 'jwt' }),
             jwt_1.JwtModule.register({
                 secret: process.env.PRIVATE_KEY || 'SECRET',
                 signOptions: {
@@ -30,7 +27,7 @@ AuthModule = __decorate([
                 }
             })
         ],
-        exports: [auth_service_1.AuthService]
+        exports: [auth_service_1.AuthService, jwt_1.JwtModule]
     })
 ], AuthModule);
 exports.AuthModule = AuthModule;

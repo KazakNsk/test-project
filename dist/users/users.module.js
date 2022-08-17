@@ -15,6 +15,7 @@ const users_service_1 = require("./users.service");
 const users_model_1 = require("./users.model");
 const tags_model_1 = require("../tags/tags.model");
 const users_tags_model_1 = require("./users-tags.model");
+const tags_module_1 = require("../tags/tags.module");
 let UsersModule = class UsersModule {
 };
 UsersModule = __decorate([
@@ -23,6 +24,7 @@ UsersModule = __decorate([
         providers: [users_service_1.UsersService],
         imports: [
             (0, common_1.forwardRef)(() => auth_module_1.AuthModule),
+            tags_module_1.TagsModule,
             sequelize_1.SequelizeModule.forFeature([users_model_1.User, tags_model_1.Tag, users_tags_model_1.UserTag])
         ],
         exports: [users_service_1.UsersService]
